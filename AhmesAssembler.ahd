@@ -1,0 +1,131 @@
+ORG 0
+
+inicio:
+
+	LDA numero0
+	STA passos
+
+	LDA numeroEntrada
+	STA maiorNumero_LSB
+	STA numero_LSB
+	
+inicioCiclo:	
+
+	LDA numero_LSB
+	SUB numero1
+	JZ Fim 			; verifica se o numero eh um
+
+	LDA numero_MSB		; carrega variaveis auxiliares
+	STA copiaNumeroMSB
+
+	LDA numero_LSB
+	STA copiaNumeroLSB
+	
+	AND numero1		; verifica se é impar oupar
+	JZ inicio_divisao
+
+inicio_multiplicacao:
+
+	MultiplicacaoPor2:			;x2
+
+		LDA copiaNumeroLSB
+		SHL
+		STA copiaNumeroLSB
+	
+		LDA copiaNumeroMSB
+		ROL
+		STA copiaNumeroMSB
+
+	SomaNumeroNovamente:			;+x
+
+		LDA copiaNumeroLSB
+		ADD numero_LSB
+		STA copiaNumeroLSB
+
+		LDA copiaNumeroMSB
+
+		JNC SomaMSB
+
+		ADD numero1
+	
+	SomaMSB:
+		ADD numero_MSB		
+		STA copiaNumeroMSB
+
+	Soma1:
+		LDA copiaNumeroLSB
+		ADD numero1 
+		STA copiaNumeroLSB
+		STA numero_LSB
+	
+		LDA copiaNumeroMSB	
+
+		JNC TerminaSoma1
+		
+		ADD numero1
+	TerminaSoma1:
+
+		STA copiaNumeroMSB
+		STA numero_MSB
+		JMP maiorNumeroMSB
+
+maiorNumeroMSB:
+	
+	LDA maiorNumero_MSB
+	SUB numero_MSB
+	JB processoCopiaValoresMaiores	; verifica se ele o numero atual é maior
+	JZ maiorNumeroLSB	; verifica se o numero atual é igual
+	JP adicionaPassos; se o maior numero continuar maior, adiciona passos
+	
+maiorNumeroLSB:
+
+	LDA maiorNumero_LSB
+	SUB numero_LSB
+	JNB adicionaPassos
+
+processoCopiaValoresMaiores:
+
+	LDA numero_MSB
+	STA maiorNumero_MSB
+	LDA numero_LSB
+	STA maiorNumero_LSB
+
+adicionaPassos:
+	LDA passos
+	ADD numero1
+	STA passos
+	JMP inicioCiclo
+
+inicio_divisao:
+
+	LDA copiaNumeroMSB
+	SHR
+	STA copiaNumeroMSB
+	STA numero_MSB
+	
+	LDA copiaNumeroLSB
+	ROR
+	STA copiaNumeroLSB
+	STA numero_LSB
+
+	JMP maiorNumeroMSB
+
+
+Fim:
+	HLT
+
+ORG 128			; variaveis
+
+	numeroEntrada: DB 64
+	passos: DB
+	maiorNumero_MSB: DB
+	maiorNumero_LSB: DB
+
+	numero_MSB: DB ; 132 assume valores no fim dos ciclos
+	numero_LSB: DB ; 133
+
+	copiaNumeroMSB: DB ; 134
+	copiaNumeroLSB: DB ; 135
+	
+	numero0: DB 0
+	numero1: DB 1 ; 136
