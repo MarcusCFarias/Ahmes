@@ -10,4 +10,4 @@ How to use:
 - Position 130: output, most significant bit
 - Position 131: output, least significant bit
 
-Note: It helps to think how a computer works. University project.
+Note: University project.
